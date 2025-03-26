@@ -7,6 +7,9 @@
 # PSK This lets WinBox work from outside the router
 /ip firewall filter add action=accept chain=input dst-port=8291 protocol=tcp
 
+#PSK Add the Juanfi user
+/user add group=full name=pisonet password=abc123
+
 #PSK Create a bridge interface and assign it an IP network / address range and setup DHCP
 /interface bridge add name=HotSpot
 /ip address add address=192.168.99.1/24 comment=HotSpot interface=HotSpot network=192.168.99.0
@@ -30,11 +33,14 @@
 /ip hotspot user add name=test password=test server=EllaFi
 
 #add static ip for ESP32
-#PSK I don't the address, address-list and mac are all needed
+#PSK I don't the address, address-list and mac are all needed 
+#NOTE address-lists adds this IP to the JuanfiVendor list 
+#NOTE2 but iteas already there, so its not needed, and doesn't make sense for a static lease
 /ip dhcp-server lease add address=192.168.99.2 address-lists=JuanfiVendo mac-address=8C:CE:4E:C8:2B:CA server=HotSpotDHCP
 
 #PSK Let anything pass coming from the ESP32 (I thought this would already happen with the IP Binding)
 #PSK Maybe the ip-binding lets you go to the internet, the firewall rule lets you hit the land?
+#PSK This address-list adds the ESP32 IP to a "JuanfiVendo" that can be used in other firewall rules
 /ip firewall address-list add address=192.168.99.2 list=JuanfiVendo
 /ip firewall filter add action=accept chain=input comment=JuanfiVendo src-address-list=JuanfiVendo
 /ip firewall filter add action=passthrough chain=unused-hs-chain comment="place hotspot rules here" disabled=yes
