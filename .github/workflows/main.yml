@@ -8,6 +8,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main # Specify your branch name here
       - uses: actions/cache@v4
         with:
           path: |
