@@ -29,7 +29,6 @@
 
 // https://arduinojson.org/v7/tutorial/deserialization/
 #include <ArduinoJson.h>
-HTTPClient mikrotikAPI;
 
 #ifdef ESP32
   #include <TelnetClient.h>
@@ -50,6 +49,7 @@ HTTPClient mikrotikAPI;
   #include <flash_hal.h>
 #endif
 
+HTTPClient mikrotikAPI;
 
 #include <EEPROM.h>
 #include "FS.h"
