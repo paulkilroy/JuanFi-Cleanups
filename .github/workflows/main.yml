@@ -27,6 +27,7 @@ jobs:
 
       - name: PWD
         run: pwd
+            ls -a
 
       - name: Build PlatformIO Project
         run: pio run
