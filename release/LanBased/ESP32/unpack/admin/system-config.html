@@ -1,0 +1,569 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin/css/admin.css">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+</head>
+
+<body onload="mainBodyLoad();">
+    <div class="page-wrapper"><span id="mobileVersion"></span>
+        <div class="menu-container" id="myTopnav">
+            <div class="wrapper">
+                <div class="section">
+                    <div class="top_navbar">
+                        <div class="hamburger"><a href="#"> &#9776; </a></div>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <div class="profile"><img id="logoImg" alt="profile_picture">
+                        <h3>JuanFI</h3>
+                        <p>Admin Console</p><button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                    <div>
+                        <ul class="menu-list">
+                            <li class="active"><a href="#" onclick="openDashboard(event)"><span
+                                        class="item">Dashboard</span></a></li>
+                            <li><a href="#" id="systemConfigMenu" onclick="openSystemConfig(event)"><span
+                                        class="item">System Configuration</span></a></li>
+                            <li><a href="#" id="firmwareUpdateMnu" onclick="openTab(event, 'FirmwareUpdate')"><span
+                                        class="item">Firmware Update</span></a></li>
+                            <li><a href="#" onclick="openActiveUsers(event)"><span class="item">Active Users</span></a>
+                            </li>
+                            <li><a href="#" onclick="openPromoRates(event)"><span class="item">Promo Rates</span></a>
+                            </li>
+                            <li><a href="#" onclick="openVoucherGenerate(event)"><span class="item">Voucher
+                                        Generation</span></a></li>
+                            <li><a href="#" onclick="openChargingStation(event)" featureType="ESP32"><span
+                                        class="item">Charging Station</span></a></li>
+                            <li><a href="#" onclick="openEloadSetting(event)"><span class="item">e-Load
+                                        Center</span></a></li>
+                            <li><a href="#" onclick="openSystemLogs(event)"><span class="item">System Logs</span></a>
+                            </li>
+                            <li><a href="#" onclick="openTab(event, 'About')"><span class="item">About</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-container">
+            <div class="content-wrapper">
+                <div id="loading" class="spinner hidden">
+                    <center>
+                        <h3 id="loadingText">Loading...</h3>
+                    </center>
+                </div>
+                <div id="Dashboard" class="tabcontent">
+                    <center>
+                        <div class="panel"><span class="title">Total Sales</span>
+                            <p id="lifeCoinCount">0</p>
+                            <div class="button-grp-horizontal"><button onClick="resetStats('lifeTimeCount')"
+                                    class="first-btn red-bg">RESET</button></div>
+                        </div>
+                        <div class="panel"><span class="title">Current Sales</span>
+                            <p id="coinCount">0</p>
+                            <div class="button-grp-horizontal"><button onClick="resetStats('coinCount')"
+                                    class="first-btn red-bg">RESET</button><button onClick="salesDetail(this)"
+                                    class="second-btn">DETAILS</button></div>
+                        </div>
+                        <div id="salesDetailDiv" style="display: none">
+                            <div class="panel"><span class="title">Daily Sales</span>
+                                <p id="dailySales">0</p>
+                                <div class="button-grp-horizontal"><button onClick="resetStats('dailySales')"
+                                        class="first-btn red-bg">RESET</button></div>
+                            </div>
+                            <div class="panel"><span class="title">Monthly Sales</span>
+                                <p id="monthlySales">0</p>
+                                <div class="button-grp-horizontal"><button onClick="resetStats('monthlySales')"
+                                        class="first-btn red-bg">RESET</button></div>
+                            </div>
+                            <div class="panel" featureType="ESP32"><span class="title">Charging Station Sales</span>
+                                <p id="chargingSales">0</p>
+                                <div class="button-grp-horizontal"><button onClick="openChargingStation(null);"
+                                        class="second-btn">DETAILS</button></div>
+                            </div>
+                            <div class="panel"><span class="title">e-Load Sales</span>
+                                <p id="eloadSalesD">0</p>
+                                <div class="button-grp-horizontal"><button onClick="openEloadSetting(null);"
+                                        class="second-btn">DETAILS</button></div>
+                            </div>
+                        </div>
+                        <div class="panel"><span class="title">Customer Served</span>
+                            <p id="customerCount">0</p>
+                            <div class="button-grp-horizontal"><button onClick="resetStats('customerCount')"
+                                    class="first-btn red-bg">RESET</button></div>
+                        </div>
+                        <div class="panel"><span class="title">Active Users</span>
+                            <p id="activeUsers">0</p>
+                            <div class="button-grp-horizontal"><button onClick="openActiveUsers(this)"
+                                    class="first-btn blue-bg">VIEW</button></div>
+                        </div>
+                        <div class="panel"><span class="title">Night Light Status</span>
+                            <div class="button-grp-horizontal"><button onClick="toggleNightLight()"
+                                    id="nightLightToggle" class="first-btn">ON</button></div>
+                        </div>
+                        <div class="panel"><span class="title">System Uptime</span>
+                            <p id="upTime">0 Day 0 hour 0 Min 0 Sec</p>
+                            <div class="button-grp-horizontal"><button onClick="restartSystem(this)"
+                                    class="first-btn red-bg">RESTART SYSTEM</button></div>
+                        </div>
+                        <div class="panel"><span class="title">System Clock</span>
+                            <p id="systemClock">0 Day 0 hour 0 Min 0 Sec</p>
+                        </div>
+                        <div class="panel"><span class="title">Device MAC Address</span>
+                            <p id="macAddress">00:00:00:00:00:00</p>
+                        </div>
+                        <div class="panel"><span class="title">Device IP Address</span>
+                            <p id="ipAddress">0.0.0.0</p>
+                        </div>
+                        <div class="panel"><span class="title">Hardware Type</span>
+                            <p id="hardwareType">Loading...</p>
+                        </div>
+                        <div class="panel"><span class="title">Interface Type</span>
+                            <p id="interfaceType">Loading...</p>
+                        </div>
+                        <div class="panel"><span class="title">WiFi Signal Strength</span>
+                            <p id="signalStrength">N/A</p>
+                        </div>
+                        <div class="panel"><span class="title">Free Heap</span>
+                            <p id="freeHeap">Checking...</p>
+                        </div>
+                        <div class="panel"><span class="title">Internet Status</span>
+                            <p id="internetStatus">Checking...</p>
+                        </div>
+                        <div class="panel"><span class="title">Mikrotik Status</span>
+                            <p id="mikrotikStatus">Checking...</p>
+                            <div class="button-grp-horizontal"><button onClick="restartMikrotik(this)"
+                                    id="restartMikrotikBtn" class="first-btn red-bg">RESTART MIKROTIK</button></div>
+                        </div>
+                    </center>
+                </div>
+                <div id="SystemConfigration" class="tabcontent">
+                    <div class="container">
+                        <div class="panel"><span class="title">Vendo Name</span><label for="email"><b>Vendo
+                                    Name</b></label><br><input type="text" placeholder="Vendo Name" id="vendoName"
+                                required></div>
+                        <div class="panel" id="apSettingDiv"><span class="title">AP Setting</span><label
+                                for="email"><b>WIFI SSID</b></label><br><input type="text" placeholder="WIFI SSID"
+                                id="wifiSSID" required>
+                            <div class="button-grp-horizontal center"><button class="first-btn"
+                                    onClick="scanSSID(this)">Scan</button></div>
+                            <div id="ssidListDiv" style="display: none"><label for="email"><b>SSID List(click to
+                                        select)</b></label><br>
+                                <div class="list-wrapper">
+                                    <ul class="ssid-list" id="ssidList"></ul>
+                                </div>
+                            </div><label for="psw"><b>WIFI Password</b></label><br><input type="password"
+                                placeholder="WIFI Password" id="wifiPW">
+                        </div>
+                        <div class="panel"><span class="title">IP Address Setting</span><label
+                                for="email"><b>Mode</b></label><br><select name="ipAddressMode" id="ipAddressMode"
+                                onChange="ipAddressModeChange(this)">
+                                <option value="0">DHCP</option>
+                                <option value="1">Static</option>
+                            </select><br>
+                            <div id="staticIpDiv" style="display: none"><label for="email"><b>Local IP
+                                        Address</b></label><br><input type="text" placeholder="Local IP Address"
+                                    id="localIpAddress" required><br><label for="email"><b>Subnet
+                                        Mask</b></label><br><input type="text" placeholder="Subnet Mask" id="subnetMask"
+                                    required><br><label for="email"><b>Gateway IP</b></label><br><input type="text"
+                                    placeholder="Gateway IP" id="gatewayIp" required><br><label for="email"><b>DNS
+                                        Server</b></label><br><input type="text" placeholder="DNS Server IP"
+                                    id="dnsServer" required><br></div>
+                        </div>
+                        <div class="panel"><span class="title">MikroTik Setting</span><label for="email"><b>Mikrotik
+                                    Router IP</b></label><br><input type="text" placeholder="Mikrotik Router IP"
+                                id="mikrotikIp" required><br><label for="email"><b>Mikrotik
+                                    Username</b></label><br><input type="text" placeholder="Mikrotik Router Username"
+                                id="mikrotikUser" required><br><label for="email"><b>Mikrotik
+                                    Password</b></label><br><input type="password"
+                                placeholder="Mikrotik Router Password" id="mikrotikPw" required><br><label
+                                for="email"><b>Confirm Mikrotik Password</b></label><br><input type="password"
+                                placeholder="Confirm Mikrotik Router Password" id="confirmMikrotikPw"
+                                required><br><label for="mtConnectionMode"><b>Connection Mode</b></label><br><select
+                                name="mtConnectionMode" id="mtConnectionMode">
+                                <option value="1">Keep Alive(always connected)</option>
+                                <option value="2" selected>On Demand(only when voucher generation)</option>
+                            </select><br></div>
+                        <div class="panel"><span class="title">Admin panel Setting</span><label for="email"><b>Admin
+                                    Username</b></label><br><input type="text" placeholder="Admin Username"
+                                id="adminUser" required><br><label for="email"><b>Admin Password</b></label><br><input
+                                type="password" placeholder="Admin Password" id="adminPw" required><label
+                                for="email"><b>Confirm Admin Password</b></label><br><input type="password"
+                                placeholder="Confirm Admin Password" id="confirmAdminPw" required></div>
+                        <div class="panel"><span class="title">Operator panel Setting(No system config
+                                priviledge)</span><label for="email"><b>Operator Username</b></label><br><input
+                                type="text" placeholder="Operator Username" id="operatorUser" value="operator"
+                                required><br><label for="email"><b>Operator Password</b></label><br><input
+                                type="password" placeholder="Operator Password" id="operatorPw" value="operator"
+                                required><label for="email"><b>Confirm Operator Password</b></label><br><input
+                                type="password" placeholder="Confirm Operator Password" value="operator"
+                                id="confirmOperatorPw" required></div>
+                        <div class="panel"><span class="title">Coin slot Setting</span><label
+                                for="coinSlotType"><b>Coinslot Slot Type</b></label><br><select
+                                onChange="coinslotTypeChange(this)" name="coinSlotType" id="coinSlotType">
+                                <option value="1">Universal Coinslot(Multicoin)</option>
+                                <option value="2">Single Coin Type Sensor</option>
+                            </select><br>
+                            <div id="singleCoinPulseDiv" style="display: none"><label for="email"><b>Single Coin Pulse
+                                        Count(Fix coin)</b></label><br><input type="number" value="1"
+                                    placeholder="Single Coin Pulse Count" id="singleCoinPulseCount"><br></div><label
+                                for="email"><b>Coin slot insert wait time(Seconds)</b></label><br><input type="text"
+                                placeholder="Coin slot insert wait time" id="coinSlotWaitTime" required><br><label
+                                for="email"><b>Coins Slot Abuse Count</b></label><br><input type="text"
+                                placeholder="Coins Slot Abuse Count" id="coinSlotAbuseCount" required><br><label
+                                for="email"><b>Coins Slot Ban Minutes</b></label><br><input type="text"
+                                placeholder="Coins Slot Ban Minutes" id="coinSlotBanMinutes" required><br><label
+                                for="email"><b>Button Function</b></label><br><select name="buttonFunction"
+                                id="buttonFunction">
+                                <option value="0" selected>Clear + Buy Button</option>
+                                <option value="1">Clear Button Only</option>
+                            </select><label for="email"><b>Coin Multiplier</b></label><br><input type="text"
+                                placeholder="Coin Multiplier" id="coinMultiplier" value="1" required><br><label
+                                for="email"><b>Bill Acceptor Multiplier</b></label><br><input type="text"
+                                placeholder="Bill Acceptor Multiplier" id="billAcceptorMultiplier" value="10"
+                                required><br><label for="pulseToBlock"><b>Block unusual pulse when greater than(Ony
+                                    works when no bill acceptor pin)</b></label><br><input type="text"
+                                placeholder="Pulse to block" id="pulseToBlock" value="20" required><br>
+                        </div>
+                        <div class="panel" id="pinSettingDiv"><span class="title">Pin Setting</span><label
+                                for="customCB"><b>Custom Board Config File(Get it from your provider):
+                                </b></label><br><input id='customCBFile' type='file' accept=".board"
+                                onchange="customBoardFileChanged(this)" /><br><label for="coinSlotPin"><b>Coinslot
+                                    Pin</b></label><br><select name="coinSlotPin" id="coinSlotPin"></select><br><label
+                                for="billAcceptorPin"><b>Bill Acceptor Pin</b></label><br><select name="billAcceptorPin"
+                                id="billAcceptorPin"></select><br><label for="coinSlotSetPin"><b>Coinslot Set
+                                    Pin</b></label><br><select name="coinSlotSetPin"
+                                id="coinSlotSetPin"></select><br><label for="systemReadyLEDPin"><b>System Ready LED
+                                    Pin</b></label><br><select name="systemReadyLEDPin"
+                                id="systemReadyLEDPin"></select><br><label for="insertCoinLEDPin"><b>Insert Coin LED
+                                    Pin</b></label><br><select name="insertCoinLEDPin"
+                                id="insertCoinLEDPin"></select><br><label for="insertCoinBtnPin"><b>Insert Coin Button
+                                    Pin</b></label><br><select name="insertCoinBtnPin"
+                                id="insertCoinBtnPin"></select><label for="nightLightPin"><b>Night Light
+                                    Pin</b></label><br><select name="nightLightPin" id="nightLightPin"></select><label
+                                for="ledTriggerType"><b>LED Trigger Output(Relay Trigger Type)</b></label><br><select
+                                name="ledTriggerType" id="ledTriggerType">
+                                <option value="0">LOW</option>
+                                <option value="1" selected>HIGH</option>
+                            </select><label for="lcdSDAPin"><b>LCD SDA Pin</b></label><br><select name="lcdSDAPin"
+                                id="lcdSDAPin"></select><label for="lcdSCLPin"><b>LCD SCL Pin</b></label><br><select
+                                name="lcdSCLPin" id="lcdSCLPin"></select>
+                            <div id="lanCSPinDiv"><label for="lanCSPin"><b>LAN CS PIN</b></label><br><select
+                                    name="lanCSPin" id="lanCSPin"></select></div>
+                            <div id="buzzerPinDiv"><label for="buzzerPin"><b>Buzzer PIN</b></label><br><select
+                                    name="buzzerPin" id="buzzerPin"></select></div>
+                        </div>
+                        <div class="panel"><span class="title">LCD Setting</span><label for="lcdScreen"><b>LCD
+                                    Screen</b></label><br><select name="lcdScreen" id="lcdScreen"
+                                onChange="lcdChange(this)">
+                                <option value="0" selected>None</option>
+                                <option value="1">16x2</option>
+                                <option value="2">20x4</option>
+                            </select><br><label for="welcomeLCDMarquee"><b>Welcome LCD Marquee(only for
+                                    20x4)</b></label><br><input type="text" placeholder="Welcome LCD Marquee"
+                                id="welcomeLCDMarquee" required><br><label for="welcomeTextFirstLine"><b>Welcome Text
+                                    First Line</b></label><br><input type="text" placeholder="Welcome Text First Line"
+                                id="welcomeTextFirstLine" required><br><label for="welcomeTextThirdLine"><b>Welcome Text
+                                    Third Line(20x4 only)</b></label><br><input type="text"
+                                placeholder="Welcome Text Last Line(20x4 only)" id="welcomeTextThirdLine"
+                                required><br><label for="insertCoinText"><b>Insert Coin Text(overflow nextline
+                                    supported)</b></label><br><input type="text" placeholder="Insert Coin Text"
+                                id="insertCoinText" required><br><label for="thankYouText"><b>Thank you text(overflow
+                                    nextline supported for 20x4)</b></label><br><input type="text"
+                                placeholder="Thank you text" id="thankYouText" required><br><label
+                                for="thankYouTimeout"><b>Thank you Display timeout(Seconds)</b></label><br><input
+                                type="text" placeholder="Thank you display timeout" id="thankYouTimeout" required></div>
+                        <div class="panel"><span class="title">Voucher Setting</span><label
+                                for="voucherPrefix"><b>Voucher Prefix(max 2, should start with
+                                    Letters)</b></label><br><input type="text" value="P"
+                                placeholder="Voucher Prefix, e.g. P, S" id="voucherPrefix" maxlength="2" required><label
+                                for="voucherLoginOption"><b>Voucher Login Option</b></label><br><select
+                                name="voucherLoginOption" id="voucherLoginOption">
+                                <option value="0">Username only</option>
+                                <option value="1">Username + Password</option>
+                            </select><label for="voucherProfile"><b>Voucher Profile</b></label><br><input type="text"
+                                value="default" placeholder="default" id="voucherProfile" required><label
+                                for="voucherValidity"><b>Voucher Validity</b></label><br><select name="voucherValidity"
+                                id="voucherValidity">
+                                <option value="0">Stack up validity when extend time</option>
+                                <option value="1">First Validity + extend time</option>
+                            </select><label for="voucherLength"><b>Voucher Length</b></label><br><input type="number"
+                                value="4" placeholder="default" id="voucherLength" required></div>
+                        <div class="panel"><span class="title">Internet Check</span><label
+                                for="checkInternetStatus"><b>Check Internet Status when insert
+                                    coin</b></label><br><select name="checkInternetStatus" id="checkInternetStatus">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select></div>
+                        <div class="panel"><span class="title">Thermal Printing</span><label
+                                for="thermalPrinterPin"><b>Printer Pin</b></label><br><select name="thermalPrinterPin"
+                                id="thermalPrinterPin"></select><label for="printOption"><b>Print
+                                    Option</b></label><br><select name="printOption" id="printOption">
+                                <option value="0">Never</option>
+                                <option value="1">Always</option>
+                                <option value="2">Only When Greater Than Amt</option>
+                                <option value="3">Only When Buy Voucher Mode</option>
+                                <option value="4">Only When Profile is</option>
+                            </select><input type="text" placeholder="Print Option Criteria"
+                                id="printOptionCriteria"><label for="includeVendoName"><b>Include
+                                    VendoName</b></label><br><select name="includeVendoName" id="includeVendoName">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select><label for="printerBaudRate"><b>Baud Rate</b></label><br><input type="text"
+                                placeholder="Print Baud Rate" id="printerBaudRate"></div>
+                        <div class="panel"><span class="title">Other Setting</span><label for="apiKey"><b>API Key(use
+                                    for remote api)</b></label><br><input type="apiKey" placeholder="API Key"
+                                id="apiKey">
+                            <div class="button-grp-horizontal center"><button class="first-btn"
+                                    onClick="generateKey(this)">Generate Key</button></div><label for="persistLogs"
+                                style="display: none;"><b>Persist Logs(Warning this will make lifespan of device
+                                    lesser)</b></label><br><select name="persistLogs" id="persistLogs"
+                                style="display: none;">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select><label for="restartSchedule"><b>Auto Restart Schedule(Minutes) (Will not restart if
+                                    vendo has activity)</b></label><br><input type="text"
+                                placeholder="Restart Schedule in minutes" id="restartSchedule" required><label
+                                for="blackoutDetection"><b> A0+3v button function </b></label><br><select
+                                name="blackoutDetection" id="blackoutDetection">
+                                <option value="0">Disable</option>
+                                <option value="1">Reset Factory Setting(Shorted within 10 sec)</option>
+                                <option value="2">Run Mikrotik Script(Shorted within 60 sec run customButtonScript in
+                                    MT)</option>
+                            </select>
+                        </div><input type="hidden" value="1" id="setupDoneFlag" /><input type="hidden" value="1"
+                            id="lanModeOverride" /><input id='importSystemConfigFile' type='file' accept=".data"
+                            onchange="systemConfigFileImportChange(this)" style="display: none" />
+                        <div class="button-grp-horizontal"><button onClick="saveSystemConfig()" type="button"
+                                class="first-btn">SAVE</button><button onClick="exportSystemConfig()" type="button"
+                                class="second-btn">BACKUP</button><button onClick="importSystemConfig()" type="button"
+                                class="third-btn">RESTORE</button></div>
+                    </div>
+                </div>
+                <div id="PromoRate" class="tabcontent">
+                    <div class="panel"><span class="title">Rates Setting</span><br />
+                        <div featureType="ESP32 center"><label for="rateType" class="rate-title"><b>Rate
+                                    Type</b></label><select name="rateType" id="rateType"
+                                onChange="onRateTypeChange(this)">
+                                <option value="1">Internet</option>
+                                <option value="2">Charging</option>
+                            </select></div>
+                        <div class="button-grp-horizontal center"><button onClick="addRate()" class="first-btn"
+                                id="addRateButton">ADD NEW RATE</button></div><br />
+                        <div id="promoRateBody"></div><input id='importRateConfigFile' type='file' accept=".data"
+                            onchange="rateConfigFileImportChange(this)" style="display: none" />
+                        <div class="button-grp-horizontal"><button onClick="savePromoRates()" type="submit"
+                                class="first-btn">SAVE</button><button onClick="exportRateConfig()" type="button"
+                                class="second-btn">BACKUP</button><button onClick="importRateConfig()" type="button"
+                                class="third-btn">RESTORE</button></div>
+                    </div>
+                </div>
+                <div id="VoucherGenerate" class="tabcontent">
+                    <div class="container">
+                        <div class="panel"><span class="title">Voucher Generation</span><label
+                                for="voucherGeneratePrefix"><b>Voucher Prefix(max 2, should start with
+                                    Letters)</b></label><br><input type="text" value="VC"
+                                placeholder="Voucher Prefix, e.g. P, S" id="voucherGeneratePrefix" maxlength="2"
+                                required><label for="voucherAmount"><b>Voucher Amount</b></label><br><input
+                                type="number" value="50" placeholder="Voucher amount" id="voucherAmount" required><label
+                                for="voucherQty"><b>Quantity(PC)</b></label><br><input type="number" value="1"
+                                placeholder="Voucher Qty" id="voucherQty" required><label for="addToSales"><b>Add to
+                                    Sales</b></label><br><select name="addToSales" id="addToSales">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select><label for="appendToPrevious"><b>Append to Previous(For printing
+                                    purpose)</b></label><br><select name="appendToPrevious" id="appendToPrevious">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select><label for="printThermalPrinter"><b>Print on Thermal Printer(Only when
+                                    available)</b></label><br><select name="printThermalPrinter"
+                                id="printThermalPrinter">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select><label>After you click the generate voucher, a popup window will appear after the
+                                generation, please check if you have popup blocker! Please avoid also qty to be more
+                                than 15 since it will take time to generate.</label><br><label>*For custom html
+                                template, please refresh the screen everytime you upload a new template.</label><br>
+                        </div>
+                        <div class="button-grp-horizontal"><button onClick="generateVoucher()" type="submit"
+                                class="first-btn">Generate Voucher</button><button onClick="downloadVoucherTemplate()"
+                                type="submit" class="second-btn">Download Template</button><input
+                                id='importVoucherTemplateFile' type='file' accept=".html"
+                                onchange="voucherTemplateFileImportChange(this)" style="display: none" /><button
+                                onClick="uploadVoucherTemplate()" type="submit" class="third-btn">Upload
+                                Template</button></div>
+                        <div id="voucherGenerateBody"></div>
+                    </div>
+                </div>
+                <div id="SystemLogs" class="tabcontent">
+                    <div class="container">
+                        <div class="panel"><span class="title">System Logs</span><label>Logging is limited and it will
+                                be clear on restart of device, please export it if you want</label>
+                            <div class="button-grp-horizontal center"><input id='importSystemLogFile' type='file'
+                                    accept=".bak" onchange="importLogs(this)" style="display: none" /><button
+                                    onClick="$('#importSystemLogFile').click()" type="button"
+                                    class="first-btn">IMPORT</button><button onClick="exportLogs()" type="button"
+                                    class="first-btn">EXPORT</button></div><br />
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <tr>
+                                        <th width="30%">Time</th>
+                                        <th width="70%">Log Message</th>
+                                    </tr>
+                                    <tbody id="logBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="button-grp-horizontal center"><button onClick="prevLogs()" type="button"
+                                    id="prevBtn" class="first-btn">Previous</button><button onClick="nextLogs()"
+                                    type="button" id="nxtBtn" class="second-btn">Next</button></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ActiveUsers" class="tabcontent">
+                    <div class="container">
+                        <div class="panel"><span class="title">Active Users</span><label>Displays all current active
+                                users</label><br /><label id="tooManyUser" style="display: none;">Sorry, Too many users
+                                are active cannot display</label>
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <tr>
+                                        <th width="20%">User</th>
+                                        <th width="30%">Mac Address</th>
+                                        <th width="30%">Session Left</th>
+                                        <th width="20%">Action</th>
+                                    </tr>
+                                    <tbody id="activeUserBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ChargingStation" class="tabcontent">
+                    <div class="panel"><span class="title">Charging Station Setting</span>
+                        <div id="chargingStationBody"></div><input id='importChargerConfigFile' type='file'
+                            accept=".data" onchange="chargerConfigFileImportChange(this)" style="display: none" />
+                        <div class="button-grp-horizontal"><button onClick="saveChargerSetting()" type="submit"
+                                class="first-btn">SAVE</button><button onClick="exportChargerSetting()" type="button"
+                                class="second-btn">BACKUP</button><button onClick="importChargerSetting()" type="button"
+                                class="third-btn">RESTORE</button></div>
+                    </div>
+                </div>
+                <div id="About" class="tabcontent">
+                    <div class="panel">
+                        <p>System Version: <span id="appVersionAbout">2.3</span></p>
+                        <p>Developer: Ivan Julius C. Alayan</p>
+                        <p>Contributors:</p>
+                        <ul class="contri-list">
+                            <li>Marie Karen M. Alayan</li>
+                            <li>Kristoffer D. Samole</li>
+                            <li>Mark Francis Ferrolino</li>
+                        </ul>
+                        <p>Facebook group: <a target="__blank" ref="noreferrer"
+                                href="https://www.facebook.com/groups/1172413279934139" />JuanFI group</a></p>
+                        <p>Facebook e-Loading page: <a target="__blank" ref="noreferrer"
+                                href="https://www.facebook.com/juanfi.juansystems" />JuanFI e-Loading page</a></p>
+                        <p>Github: <a target="__blank" ref="noreferrer" href="https://github.com/ivanalayan15/JuanFi">
+                                For issues / request</a></p>
+                    </div>
+                </div>
+                <div id="FirmwareUpdate" class="tabcontent">
+                    <div class="container">
+                        <div class="panel"><span class="title">Firmware Update</span><label
+                                for="currentVersion"><b>Current Firmware Version: <span
+                                        id="currentVersion">2.3</span></b></label><label for="mainBin"><b>Bin
+                                    Type:</b></label><br /><select name="binFileType" id="binFileType">
+                                <option value="sketch">Bin 1(Sketch[JuanFi-FlashFile1.bin or JuanFi-lan.ino.bin])
+                                </option>
+                                <option value="filesystem">Bin 2(Filesystem[JuanFi-FlashFile2.bin or
+                                    JuanFi-lan.spiffs.bin]) </option>
+                            </select><label for="mainBin"><b>Bin File:</b></label><br /><input type="file"
+                                name="mainBin" id="mainBin" accept=".bin" required>
+                            <div class="button-grp-horizontal center"><button onClick="uploadMainBin()" type="button"
+                                    class="first-btn">UPDATE FIRMWARE</button></div><label>Updating of BIN is 1 at a
+                                time, if the release have both bin file update, update the bin2 first before the
+                                bin1</label><br /><label>If have BIN 2 update, Promo rates configuration will be reset,
+                                make sure to backup it first and restore after, ONLY system configuration will be backup
+                                automatically</label><br />
+                        </div>
+                    </div>
+                </div>
+                <div id="EloadCenter" class="tabcontent">
+                    <div class="container">
+                        <div class="panel"><span class="title">e-Load Account</span>
+                            <div class="important-note"> For account registrations and/or account reloading, please
+                                visit our <a target="__blank" href="https://www.facebook.com/juanfi.juansystems">JuanFI
+                                    e-Loading Facebook page</a>.<br />Click "Send a message" button and click or type
+                                "register" to register a new account or "reload" to top up your existing account.</div>
+                            <label for="eloadEnable"><b>e-Load Enable:</b></label><br /><select name="eloadEnable"
+                                id="eloadEnable">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select><label for="eloadProvider"><b>Line # (will be given together with your
+                                    acct):</b></label><br /><select name="eloadProvider" id="eloadProvider">
+                                <option value="1">Line 1 (Always success for demo use only)</option>
+                                <option value="2">Line 2</option>
+                                <option value="3">Line 3</option>
+                                <option value="4">Line 4</option>
+                            </select><label for="email"><b>Username</b></label><br /><input type="text"
+                                placeholder="Username" id="eloadUser" required><br /><label
+                                for="eloadPw"><b>Password</b></label><br />
+                            <div class="password-grp"><input type="password" placeholder="Password" id="eloadPw"
+                                    required /><label for="togglePassword" class="toggle-label"><input
+                                        id="togglePassword" type="checkbox" onchange="showPassword(this)" />Show
+                                    password </label></div><br />
+                            <div id="eloadBalanceDiv" style="display: none;"><label for="email"><b>Balance: <span
+                                            id="eloadBal">0.00</span></b></label><br /></div>
+                            <div class="button-grp-horizontal center"><button onClick="saveEloadSettings()"
+                                    type="button" class="first-btn">Save Settings</button><button
+                                    onClick="checkEloadBalance()" type="button" class="second-btn">Check
+                                    Balance</button></div>
+                        </div>
+                        <div class="panel"><span class="title">e-Load Transactions</span><label>Logging is limited,
+                                please clear the transactions often to avoid having insuficient space
+                                issue</label><label for="totalEloadSales"> Total Sales: <span
+                                    id="eloadSales">0.00</span></label><label for="totalRefund"> Total Refund: <span
+                                    id="eloadRefund">0.00</span></label>
+                            <div class="button-grp-horizontal center"><button onClick="clearEloadLog()" type="button"
+                                    class="first-btn">Clear All</button></div><br />
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <tr>
+                                        <th width="30%">Time</th>
+                                        <th width="20%">Mobile#</th>
+                                        <th width="10%">Amount</th>
+                                        <th width="25%">Voucher/Refund</th>
+                                        <th width="15%">Status</th>
+                                    </tr>
+                                    <tbody id="eloadTrxBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel"><span class="title">e-Load Rates</span>
+                            <div class="important-note">Newly flashed hardware does not have configured rates, please
+                                upload your rates file first. Product templates are available under "Rates Template
+                                (base file)".</div><label for="eloadRates"><b>Upload New Rates:</b></label>
+                            <div class="upload-rates-grp clearfix"><input type="file" name="eloadRatesFile"
+                                    id="eloadRatesFile" onChange="eloadRateFileChange(this)" accept=".csv"
+                                    required><button onClick="saveEloadRates()" type="button"
+                                    class="upload-rates-btn">Update Rates</button></div><br /><label><b>Current
+                                    Rates:</b></label>
+                            <div><button onClick="exportEloadRates()" type="button"
+                                    class="download-edited-btn yellow-bg">Download</button></div><br /><label><b>Rates
+                                    Template (base file):</b></label>
+                            <div class="button-grp-horizontal center"><button onClick="downloadLimitedRates()"
+                                    type="button" class="first-btn"> &lt; PHP100 Product List</button><button
+                                    onClick="downloadCompleteRates()" type="button" class="second-btn">Complete Product
+                                    List</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script> function mainBodyLoad() { jQuery.cachedScript = function (url, options) { options = $.extend(options || {}, { dataType: "script", cache: true, url: url }); return jQuery.ajax(options); }; $.cachedScript("admin/js/admin.js").done(function (script, textStatus) { onBodyLoad(); }).fail(function (jqxhr, settings, exception) { }); } </script>
+            <script src="admin/js/jquery.min.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>

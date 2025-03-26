@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        @media print {
+            @page {
+                size: 279.4mm 215.9mm !important;
+                margin: 20mm !important;
+            }
+
+            #printBtn {
+                display: none;
+            }
+
+            #clearBtn {
+                display: none;
+            }
+
+            .pagebreak {
+                clear: both;
+                page-break-after: right;
+            }
+
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 5pt;
+            margin: 0;
+        }
+
+        .parent-div {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-around;
+            padding: 0;
+        }
+
+        .voucher-template {
+            width: calc((215.9mm - 25.4mm) / 3);
+            height: max-content;
+            border: 2px dotted #485460;
+            /*width: 300px;
+            height: 150px;*/
+            border-radius: 10px;
+            margin: 5px 0 0 5px;
+            padding: 5px 0 10px 5px;
+            float: left;
+        }
+
+        /*.column {
+            float: left;
+            width: 20.1%;
+            padding: 1 0px;
+        }*/
+
+        /*.voucher-wrapper {
+            border: 2px dotted #485460;
+            width: 300px;
+            height: 150px;
+            border-radius: 10px;
+            margin-top: 5px;
+            margin-left: 5px;
+        }*/
+
+        .voucher-container {
+            padding: 2px 16px;
+        }
+
+        .voucher-title {
+            display: block;
+            text-align: center;
+            padding: 5px;
+            color: #ff7f50;
+        }
+
+        .column-1 {
+            float: left;
+            width: 45%;
+            display: table-column;
+        }
+
+        .column-2 {
+            float: right;
+            width: 55%;
+            display: table-column;
+        }
+
+        hr {
+            border: 2px solid #485460;
+        }
+
+        .qr-wrapper {
+            margin-top: 7px;
+        }
+
+        .qr-scan {
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 8px;
+            /*writing-mode: vertical-rl;
+            text-orientation: mixed;*/
+        }
+
+        .qr-img {
+            display: inline;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .voucher-code {
+            text-transform: uppercase;
+        }
+
+        .dtls {
+            margin-top: 5px;
+        }
+
+        .dtl-col1 {
+            font-size: 13px;
+            float: left;
+            width: 50%;
+            display: table-column;
+        }
+
+        .dtl-col2 {
+            font-size: 13px;
+            float: right;
+            width: 50%;
+            display: table-column;
+        }
+
+        .dtl-row {
+            padding: 2px;
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .info {
+            font-size: 13px;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+    <script>
+
+        function printMe() {
+            window.print();
+        }
+
+        function clearAll() {
+            hideVoucher();
+            localStorage.removeItem("voucherData");
+        }
+
+        function showVoucher() {
+            document.getElementById("voucherList").classList.remove("hide");
+        }
+
+        function hideVoucher() {
+            document.getElementById("voucherList").classList.remove("hide");
+            document.getElementById("voucherList").className += " hide";
+        }
+
+        function getVoucherTemplate() {
+            return '<div class="voucher-template">' +
+                '        <div class="voucher-coupon voucher-wrapper column">' +
+                '            <div class="voucher-container">' +
+                '                <div class="column-1">' +
+                '                    <div class="qr-wrapper">' +
+                '                        <span class="qr-scan">SCAN QR IMAGE</span>' +
+                '                        <img class="qr-img" alt="" src="${REPLACE_QR_CODE}" />' +
+                '                    </div>' +
+                '                </div>' +
+                '                <div class="column-2">' +
+                '                    <div class="dtls">' +
+                '                        <div class="voucher-title">' +
+                '                            <span class="vendo-name">${REPLACE_VENDO_NAME}</span>' +
+                '                        </div>' +
+                '                        <hr />' +
+                '                        <div class="dtl-col1">' +
+                '                            <div class="dtl-row">Code:</div>' +
+                '                            <div class="dtl-row">Amount:</div>' +
+                '                            <div class="dtl-row">Duration:</div>' +
+                '                        </div>' +
+                '                        <div class="dtl-col2">' +
+                '                            <div class="dtl-row"><span class="voucher-code voucher-dtl">${REPLACE_VOUCHER_CODE}</span>' +
+                '                            </div>' +
+                '                            <div class="dtl-row"><span class="voucher-amt voucher-dtl">${REPLACE_AMOUNT}</span>' +
+                '                            </div>' +
+                '                            <div class="dtl-row"><span class="voucher-duration voucher-dtl">${REPLACE_DURATION}</span>' +
+                '                            </div>' +
+                '                        </div>' +
+                '                    </div>' +
+                '                </div>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>';
+        }
+
+        function onLoad() {
+            var voucherTemplate = getVoucherTemplate();
+            var html = "";
+            var data = localStorage.getItem("voucherData");
+            if (data === null || data === "") {
+                hideVoucher();
+            } else {
+                var localData = data.split("~");
+                for (var k = 0; k < localData.length; k++) {
+                    var voucherData = localData[k].split("|");
+                    var voucherRows = voucherData[3] ? voucherData[3].split("#") : [];
+                    for (var i = 0; i < voucherRows.length; i++) {
+                        var rowScript = getVoucherTemplate();
+                        if (voucherRows[i]) {
+                            var voucherCode = voucherRows[i];
+
+                            rowScript = rowScript.replace("${REPLACE_VOUCHER_CODE}", voucherCode);
+                            rowScript = rowScript.replace("${REPLACE_QR_CODE}", "https://api.qrserver.com/v1/create-qr-code/?size=75x75&data=" + voucherCode);
+                        }
+
+                        if (voucherData[0]) {
+                            rowScript = rowScript.replace("${REPLACE_VENDO_NAME}", voucherData[0]);
+                        }
+                        if (voucherData[1]) {
+                            rowScript = rowScript.replace("${REPLACE_AMOUNT}", parseFloat(voucherData[1]).toFixed(2));
+
+                        }
+                        if (voucherData[2]) {
+                            rowScript = rowScript.replace("${REPLACE_DURATION}", secondsToDhms(voucherData[2]));
+                        }
+                        html += rowScript;
+                    }
+                }
+                document.getElementById("voucherList").innerHTML = html;
+                showVoucher();
+            }
+        }
+        function secondsToDhms(seconds) {
+            seconds = Number(seconds);
+            var d = Math.floor(seconds / (3600 * 24));
+            var h = Math.floor(seconds % (3600 * 24) / 3600);
+            var m = Math.floor(seconds % 3600 / 60);
+            var s = Math.floor(seconds % 60);
+
+            var dDisplay = d > 0 ? d + (d == 1 ? " Day " : " Days ") : "";
+            var hDisplay = h > 0 ? h + (h == 1 ? " Hour " : " Hours ") : "";
+            var mDisplay = m > 0 ? m + (m == 1 ? " Min " : " Mins ") : "";
+            return dDisplay + hDisplay + mDisplay;
+        }
+
+    </script>
+
+</head>
+
+<body onLoad="onLoad()">
+    <button id="printBtn" onclick="printMe(this)">Print</button>
+    <button id="clearBtn" onclick="clearAll(this)">Clear</button>
+
+    <div id="voucherList" class="parent-div">
+
+    </div>
+</body>
+
+</html>

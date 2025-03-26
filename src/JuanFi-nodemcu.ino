@@ -27,8 +27,14 @@
 //increase always when publishing a new version for tracking
 #define CURRENT_VERSION "2.4"
 
+// https://arduinojson.org/v7/tutorial/deserialization/
+#include <ArduinoJson.h>
+HTTPClient mikrotikAPI;
+
 #ifdef ESP32
   #include <TelnetClient.h>
+  #include <WebServer.h>
+  #include <HTTPClient.h>
   #include "lan_definition.h"
   #include <SPIFFS.h>
   #include <Update.h>
@@ -159,9 +165,10 @@ IPAddress primaryDNS(192, 168, 10, 1); // this is optional
 IPAddress apIP(172, 217, 28, 1);
 
 #ifdef ESP32
-  EthernetWebServer server(80);
+  //EthernetWebServer server(80);
+  WebServer server(80);
   EthernetClient client;
-  EthernetClient client2;
+  WiFiClient client2; // PSK WiFiClient is jsut a TCP client.. 
   telnetClient tc(client);
 #else
   WiFiClient client2;
@@ -186,9 +193,9 @@ long lastPrinted = 0;
 
 String MARQUEE_MESSAGE = "This is marquee";
 
-void setup () { 
+void setup() { 
                                 
-  Serial.begin (115200);
+  Serial.begin(115200);
   EEPROM.begin(512);
   if(!SPIFFS.begin()){
     Serial.println("An Error has occurred while mounting SPIFFS");
@@ -282,6 +289,8 @@ void setup () {
   }else{
     #ifdef ESP32
       //nothing
+      // PSK XXX Why no wifi setup for ESP32? 
+      // DNSServer is for the setup URL
     #else
       //Soft AP setup
       WiFi.mode(WIFI_AP);
@@ -345,6 +354,12 @@ void setup () {
   server.on("/admin/updateMainBin", HTTP_POST, handleFileUploadRequest, handleFileUploadStream);
   
   populateRates();
+
+  mikrotikAPI.setAuthorization(user.c_str(), pwd.c_str());
+  if(!mikrotikAPI.begin(mikrotikRouterIp.toString(), 8728) ) {
+    Serial.println("Failed to connect to mikrotik");
+    mikrotekConnectionSuccess = false;
+  }
   
   server.begin();
   
@@ -451,22 +466,22 @@ void initializeLANSetup(){
   delay(3000);
   Serial.print("\nStarting ESP32_FS_EthernetWebServer on " + String(BOARD_TYPE));
   Serial.println(" with " + String(SHIELD_TYPE));
-  Serial.println(ETHERNET_WEBSERVER_VERSION);
+  //Serial.println(ETHERNET_WEBSERVER_VERSION);
 
-  ET_LOGWARN(F("=========== USE_ETHERNET ==========="));
+  Serial.println(F("=========== USE_ETHERNET ==========="));
 
-  ET_LOGWARN(F("Default SPI pinout:"));
-  ET_LOGWARN1(F("MOSI:"), MOSI);
-  ET_LOGWARN1(F("MISO:"), MISO);
-  ET_LOGWARN1(F("SCK:"),  SCK);
-  ET_LOGWARN1(F("SS:"),   SS);
-  ET_LOGWARN(F("========================="));
+  Serial.println(F("Default SPI pinout:"));
+  Serial.printf("MOSI: %d\n", MOSI);
+  Serial.printf("MISO: %d\n", MISO);
+  Serial.printf("SCK: %d\n",  SCK);
+  Serial.printf("SS: %d\n",   SS);
+  Serial.println(F("========================="));
 
   #ifndef USE_THIS_SS_PIN
     #define USE_THIS_SS_PIN   5   //22    // For ESP32
   #endif
 
-  ET_LOGWARN1(F("ESP32 setCsPin:"), USE_THIS_SS_PIN);
+  Serial.printf("ESP32 setCsPin: %d]n", USE_THIS_SS_PIN);
   Ethernet.init (USE_THIS_SS_PIN);
   // start the ethernet connection and the server:
   Serial.println("Ethernet initialized...");
@@ -871,27 +886,10 @@ bool checkIfSystemIsAvailable(){
 }
 
 
-
-#ifdef ESP32
-  char internetServerAddress[] = "ifconfig.me";  // server address
-  int internetCheckPort = 80;
-  EthernetHttpClient  httpClient(client2, internetServerAddress, internetCheckPort);
-#else
   String INTERNET_CHECK_URL = "http://ifconfig.me";
-#endif
+
 
 bool hasInternetConnect(){
-
-    #ifdef ESP32
-      httpClient.get("/");
-      int statusCode = httpClient.responseStatusCode();
-      String response = httpClient.responseBody();
-      Serial.print("Status code: ");
-      Serial.println(statusCode);
-      Serial.print("Response: ");
-      Serial.println(response);
-      return true;
-    #else
       HTTPClient http;  
   
       http.begin(client2, INTERNET_CHECK_URL); //HTTP
@@ -911,7 +909,6 @@ bool hasInternetConnect(){
         http.end();
         return false;
       }
-    #endif
 }
 
 void addAttemptToCoinslot(){

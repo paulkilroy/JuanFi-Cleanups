@@ -1,0 +1,208 @@
+﻿<html>
+
+<head>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="admin/js/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #3d4044;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #191e2d;
+            height: auto;
+            width: 400px;
+            margin: auto;
+            padding: 0 15px 30px 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            box-shadow: 0 0 2px #000
+        }
+
+        .logo {
+            width: 200px;
+            height: auto;
+            margin: 40px 0 40px 0
+        }
+
+        .form-inline {
+            display: flex;
+            flex-flow: row wrap;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .form-inline label {
+            margin: 5px 10px 5px 0;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .form-inline input {
+            vertical-align: middle;
+            margin: 5px 10px 10px 5px;
+            padding: 10px;
+            background-color: #191e2d;
+            border: 2px solid #485460;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .form-inline button {
+            padding: 10px 20px;
+            background-color: dodgerblue;
+            border: 1px solid #ddd;
+            color: white;
+            cursor: pointer;
+            border: none;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .form-inline button:hover {
+            background-color: royalblue;
+        }
+
+        footer {
+            color: #bbb;
+            font-size: 12px;
+            margin-top: 50px
+        }
+
+        .footer a {
+            text-decoration: none;
+            color: dodgerblue;
+        }
+
+        .footer a:hover {
+            color: orange
+        }
+
+        #version {
+            color: #bbb;
+            font-size: 9px;
+            margin-top: -79px;
+            padding-left: 83px;
+            position: absolute
+        }
+
+        @media (max-width: 400px) {
+            .form-inline input {
+                margin: 10px 0;
+            }
+
+            .form-inline {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .spinner {
+            position: fixed;
+            z-index: 99;
+            opacity: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: white;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .spinner.hidden {
+            display: none
+        }
+    </style>
+    <script> 
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
+function login() {
+    var username = $("#username").val();
+    var password = $("#password").val();
+    var randomToken = randomString(10);
+    var postData = "username=" + username + "&password=" + password + "&randomToken=" + randomToken;
+    $.ajax({
+        type: "POST",
+        url: "/validateLogin",
+        data: postData,
+        success: function(data) {
+            var result = data.split("|");
+            if (result[0] == "ok") {
+                localStorage.setItem("token", result[1]);
+                window.location.href = "/admin";
+            } else {
+                alert("Username or password is not correct!");
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error: " + errorThrown);
+        }
+    });
+}
+
+function showPW() {
+    var x = document.getElementById("password");
+    if (x.type === "password") {
+        x.type = "text";
+    } else {
+        x.type = "password";
+    }
+}
+
+function onLoad() {
+    $('#password').keypress(function(e) {
+        var key = e.which;
+        if (key == 13) {
+            $('#loginBtn').click();
+            return false;
+        }
+    });
+    $(document).ajaxStart(function() {
+        $("#loading").attr("class", "spinner");
+        $("#loadingText").attr("style", "");
+    });
+    $(document).ajaxComplete(function() {
+        $("#loading").attr("class", "hidden");
+        $("#loadingText").attr("style", "display: none");
+    });
+}
+    </script>
+</head>
+
+<body onLoad="onLoad()">
+    <center>
+        <div id="loading" class="spinner hidden">
+            <center>
+                <h3 id="loadingText">Loading...</h3>
+            </center>
+        </div>
+    </center>
+    <div class="container">
+        <center><img class="logo" src="admin/image/logo.png" /></center>
+        <center><span id="version">v4.3</span></center>
+        <form class="form-inline" action="/action_page.php">
+            <input type="text" id="username" placeholder="Username" name="email">
+            <input type="password" key id="password" placeholder="Password" name="pswd">
+            <label><input type="checkbox" onclick="showPW()">Show Password</label>
+            <button type="button" id="loginBtn" onClick="login(this)">Login</button></form>
+        <footer>
+            <span class="footer">Join us on <a href="https://www.facebook.com/groups/1172413279934139">JuanFi
+                    Facebook</a></span>
+            <br>
+            <span class="footer"><b>JuanFi</b> is free and opensource</a></span>
+            <br> All Rights Reserved 2022 &copy; 
+        </footer>
+    </div>
+</body>
+
+</html>

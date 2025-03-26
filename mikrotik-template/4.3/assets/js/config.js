@@ -39,7 +39,7 @@ var loginOption = 0; //replace 1 if you want login voucher by username + passwor
 
 var dataRateOption = false; //replace true if you enable data rates
 //put here the default selected address
-var vendorIpAddress = "10.1.0.41";
+var vendorIpAddress = "192.168.99.2";
 
 var chargingEnable = false; //replace true if you enable charging, this can be override if multivendo setup
 
