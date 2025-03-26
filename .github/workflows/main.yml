@@ -1,0 +1,36 @@
+name: PlatformIO CI PSK
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master # Specify your branch name here
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Check PlatformIO
+        run: pio system info
+
+      - name: PWD
+        run: |
+          pwd
+          ls -a
+
+      - name: Build PlatformIO Project
+        run: pio run
+
+      
