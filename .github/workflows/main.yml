@@ -34,7 +34,7 @@ jobs:
         run: pio run
 
       - name: Upload PlatformIO Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: platformio-build
           path: .pio/build/**  # Adjust this path if necessary
