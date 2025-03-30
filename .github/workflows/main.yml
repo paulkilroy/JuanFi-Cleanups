@@ -1,5 +1,8 @@
 name: PlatformIO CI PSK
-
+permissions:
+  contents: read
+  pull-requests: write
+  
 on: [push]
 
 jobs:
