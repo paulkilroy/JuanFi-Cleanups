@@ -39,7 +39,7 @@ def merge_bin_action(source, target, env):
     env.Execute(merge_cmd)
 
 
-env.AddCustomTarget(
+env.AddCustomTarget( # type: ignore
     name="mergebin",
     dependencies=firmware_bin,
     actions=merge_bin_action,

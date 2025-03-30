@@ -23,7 +23,7 @@
 #include <SPI.h>
 #define USE_ETHERNET   true
 //#include "Ethernet.h"
-#warning Using Ethernet lib
+//#warning Using Ethernet lib
 #define SHIELD_TYPE           "W5x00 using Ethernet Library"
 
 //#include <EthernetWebServer.h>
