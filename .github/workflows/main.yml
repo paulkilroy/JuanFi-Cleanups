@@ -31,7 +31,7 @@ jobs:
           ls -a
 
       - name: Build PlatformIO Project
-        run: pio run
+        run: pio run -t mergebin
 
       - name: Upload PlatformIO Build Artifacts
         uses: actions/upload-artifact@v4
@@ -39,3 +39,25 @@ jobs:
           name: platformio-build
           path: .pio/build/**  # Adjust this path if necessary
 
+#      - name: Upload multiple artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: artifact1
+#          path: path/to/artifact1
+  
+#      - name: Upload another artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: artifact2
+#          path: path/to/artifact2
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        # only run this step when a tag is pushed with the format vX.X.X
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          #Remove this when the code acutally works
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            .pio/build/**/*-merged.bin

@@ -1,6 +1,5 @@
-
-#ifndef defines_h
-#define defines_h
+#ifndef LAN_DEFINITION_H
+#define LAN_DEFINITION_H
 
 #if !(ESP32)
   #error This code is intended to run on the ESP32 platform! Please check your Tools->Board setting.
@@ -11,7 +10,7 @@
 // Debug Level from 0 to 4
 #define _ETHERNET_WEBSERVER_LOGLEVEL_       3
 
-#warning Use ESP32 architecture
+//#warning Use ESP32 architecture
 #define ETHERNET_USE_ESP32
 #define BOARD_TYPE      "ESP32"
 
@@ -34,4 +33,4 @@
   #define SHIELD_TYPE     "Unknown Ethernet shield/library" 
 #endif
 
-#endif    //defines_h
+#endif // LAN_DEFINITION_H
