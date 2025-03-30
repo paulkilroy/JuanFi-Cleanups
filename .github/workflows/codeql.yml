@@ -91,6 +91,7 @@ jobs:
     - if: matrix.build-mode == 'manual'
       shell: bash
       run: |
+        pip install --upgrade platformio
         pio run -t mergebin
 
     - name: Perform CodeQL Analysis
