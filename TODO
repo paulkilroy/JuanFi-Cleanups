@@ -1,0 +1,57 @@
+## IN MIKROTIK TEMPLATE (USER LAND)
+x/cancelTopUp
+x/getRates
+x/topUp
+x/useVoucher
+x/checkCoin
+x/health -- NOT USED IN NEW VERSION
+
+#Missing
+/logout
+/status -- maybe "/health"
+/convertVoucher
+/getChargingStation
+/eload/process
+/eload/rates
+/eload/topUp
+/data/"+macNoColon+".txt
+
+## IN SPIFFS / NEW UNPACKED DATA (ADMIN LAND)
+x/admin
+x admin/api/dashboard
+x admin/api/generateVouchers
+x admin/api/getRates
+x admin/api/getSystemConfig
+x admin/api/logout
+x admin/api/resetStatistic
+x admin/api/saveRates
+x admin/api/saveSystemConfig
+x admin/updateMainBin
+x admin/viewGeneratedVouchers
+
+## Make it easy to setup / administer
+/validateLogin
+admin/api/scanSSID
+admin/api/getActiveUsers
+admin/api/kickActiveUser
+admin/api/getSystemLogs
+admin/api/getSalesDetail
+admin/api/restartMikrotik
+admin/api/restartSystem
+
+## Conveinence support
+admin/api/toggerNightLight
+admin/api/uploadVoucherTemplate
+
+## Charger Support ???
+admin/api/getChargerSettings
+admin/api/saveChargerSetting
+
+## Eload Stuff -- will do last
+admin/api/eload/checkBalance
+admin/api/eload/getRates
+admin/api/eload/getSetting
+admin/api/eload/getTrxs
+admin/api/eload/resetTrxs
+admin/api/eload/saveSetting
+admin/api/eload/uploadRates
