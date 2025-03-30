@@ -4,9 +4,9 @@
 # Adds PlatformIO post-processing to merge all the ESP flash images into a single image.
 import os
 
-Import("env", "projenv")
+Import("env", "projenv") # type: ignore
 
-board_config = env.BoardConfig()
+board_config = env.BoardConfig() # type: ignore
 firmware_bin = "${BUILD_DIR}/${PROGNAME}.bin"
 board_name = board_config.get("name", "unknownboard").replace(" ", "_")  # Replace spaces with underscores
 merged_bin = os.environ.get("MERGED_BIN_PATH", "${BUILD_DIR}/" + board_name + "-merged.bin")
