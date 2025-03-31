@@ -1,3 +1,6 @@
+// https://github.com/platformio/platformio-vscode-ide/blob/3af388134660f5c347be18686cbd349cca91c235/package.json#L681
+
+
 {
 	"version": "2.0.0",
 	"tasks": [
@@ -5,7 +8,7 @@
 			"type": "PlatformIO",
 			"task": "Build",
 			"problemMatcher": [
-				{ "base": "$platformio", "fileLocation": [ "absolute" ] }
+				{ "base": "$platformio", "fileLocation": [ "autoDetect", "${workspaceFolder}" ] }
 			],
 			"group": "build",
 			"label": "PlatformIO: Build"
