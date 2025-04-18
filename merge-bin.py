@@ -11,6 +11,9 @@ firmware_bin = "${BUILD_DIR}/${PROGNAME}.bin"
 board_name = board_config.get("name", "unknownboard").replace(" ", "_")  # Replace spaces with underscores
 merged_bin = os.environ.get("MERGED_BIN_PATH", "${BUILD_DIR}/" + board_name + "-merged.bin")
 
+print("FLASH_EXTRA_IMAGES: %s\n" % env["FLASH_EXTRA_IMAGES"])
+print("ESP32_APP_OFFSET: %s\n" % env["ESP32_APP_OFFSET"])
+#print(env.Dump())
 
 def merge_bin_action(source, target, env):
     flash_images = [
@@ -34,6 +37,7 @@ def merge_bin_action(source, target, env):
             "--flash_size",
             board_config.get("upload.flash_size", "4MB"),
             *flash_images,
+            "0x210000 .pio/build/esp32-poe/spiffs.bin"
         ]
     )
     env.Execute(merge_cmd)

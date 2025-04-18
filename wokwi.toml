@@ -1,0 +1,25 @@
+[wokwi]
+version = 1
+elf = ".pio/build/esp32-poe/firmware.elf"
+# firmware = ".pio/build/esp32-poe/firmware.bin"
+firmware = ".pio/build/esp32-poe/OLIMEX_ESP32-PoE-merged.bin"
+# gdbServerPort=3333
+
+
+# Forward http://localhost:8443 to port 443 on the simulated ESP32:
+[[net.forward]]
+from = "localhost:8443"
+to = "target:443"
+
+
+#[[net.forward]]
+#from = "localhost:3000"
+#to = "target:3000"
+
+# Above is for the internal private gateway OR you can run the external one and see the logs below
+
+#[net]
+#gateway='ws://localhost:9011'
+#if you go this route -- make sure you run the following commandline gateway
+# the only advantage is you get to see the logs:
+# ./wokwigw-darwin_arm64 --forward 8443:10.13.37.2:443

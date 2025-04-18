@@ -193,7 +193,7 @@ long lastPrinted = 0;
 
 String MARQUEE_MESSAGE = "This is marquee";
 
-void setup() { 
+void xsetup() { 
                                 
   Serial.begin(115200);
   EEPROM.begin(512);
@@ -354,18 +354,21 @@ void setup() {
   server.on("/admin/updateMainBin", HTTP_POST, handleFileUploadRequest, handleFileUploadStream);
   
   populateRates();
-
+Serial.println("pk1");
   mikrotikAPI.setAuthorization(user.c_str(), pwd.c_str());
   if(!mikrotikAPI.begin(mikrotikRouterIp.toString(), 8728) ) {
     Serial.println("Failed to connect to mikrotik");
     mikrotekConnectionSuccess = false;
   }
-  
+Serial.println("pk2");
+
   server.begin();
-  
+  Serial.println("pk3");
+
   if(mikrotekConnectionSuccess){
     digitalWrite(SYSTEM_READY_LED, evaluateTriggerOutput(TURN_ON));
   }
+  Serial.println("pk4");
 
 }
 
@@ -1475,7 +1478,8 @@ void populateRates(){
 int coinWaiting = 0;
 long lastLinkStatusCheck = 0;
 
-void loop () {
+void xloop () {
+  Serial.println("pkl1");
    if(networkConnected){
     unsigned long currentMilis = millis();
 
@@ -1607,7 +1611,8 @@ void loop () {
      dnsServer.processNextRequest();
     #endif
   }
-  
+  Serial.println("pkl9");
+
   server.handleClient();
   #ifdef ESP32
     //nothing
