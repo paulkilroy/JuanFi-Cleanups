@@ -1,6 +1,7 @@
 name: PlatformIO CI PSK
 permissions:
-  contents: read
+  contents: write
+  discussions: write
   actions: read
   checks: write
   pull-requests: write
