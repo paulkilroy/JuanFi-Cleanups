@@ -34,7 +34,7 @@ jobs:
           ls -a
 
       - name: Build PlatformIO Project
-        run: pio run -t mergebin
+        run: pio run
 
       - name: Upload PlatformIO Build Artifacts
         uses: actions/upload-artifact@v4

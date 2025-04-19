@@ -92,7 +92,7 @@ jobs:
       shell: bash
       run: |
         pip install --upgrade platformio
-        pio run -t mergebin
+        pio run
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

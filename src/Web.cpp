@@ -107,7 +107,7 @@ bool webSetup() {
             Serial.println("Loaded Private Key (Base64):");
             Serial.println(keyBase64);
             */
-
+           
             // Null-terminate the buffers
             certData[certLen] = '\0';
             keyData[keyLen] = '\0';
